@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tomathics_design_system/tomathics_design_system.dart';
 
+import 'login_demo_page.dart';
+
 void main() => runApp(const TomathicsGalleryApp());
 
 class TomathicsGalleryApp extends StatefulWidget {
@@ -31,7 +33,7 @@ class _TomathicsGalleryAppState extends State<TomathicsGalleryApp> {
   }
 }
 
-class GalleryPage extends StatelessWidget {
+class GalleryPage extends StatefulWidget {
   const GalleryPage({
     required this.isDark,
     required this.onThemeChanged,
@@ -42,18 +44,42 @@ class GalleryPage extends StatelessWidget {
   final ValueChanged<bool> onThemeChanged;
 
   @override
+  State<GalleryPage> createState() => _GalleryPageState();
+}
+
+class _GalleryPageState extends State<GalleryPage> {
+  bool _showLoginDemo = false;
+
+  @override
   Widget build(BuildContext context) {
+    if (_showLoginDemo) {
+      return LoginDemoPage(
+        isDark: widget.isDark,
+        onThemeChanged: widget.onThemeChanged,
+        onReturn: () => setState(() => _showLoginDemo = false),
+      );
+    }
+
     final palette = Theme.of(context).colorScheme;
     final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       body: Row(
         children: [
           if (width >= TomathicsLayout.expandedBreakpoint)
-            _Sidebar(isDark: isDark),
+            _Sidebar(
+              isDark: widget.isDark,
+              loginSelected: false,
+              onOpenLoginDemo: () => setState(() => _showLoginDemo = true),
+            ),
           Expanded(
             child: Column(
               children: [
-                _TopBar(isDark: isDark, onThemeChanged: onThemeChanged),
+                _TopBar(
+                  isDark: widget.isDark,
+                  onThemeChanged: widget.onThemeChanged,
+                  onOpenLoginDemo: () => setState(() => _showLoginDemo = true),
+                  showLoginAction: width < TomathicsLayout.expandedBreakpoint,
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: EdgeInsets.all(
@@ -67,7 +93,7 @@ class GalleryPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _PageHeading(isDark: isDark),
+                            _PageHeading(isDark: widget.isDark),
                             const SizedBox(height: 32),
                             _Section(
                               title: 'Cores e estados',
@@ -195,9 +221,15 @@ class GalleryPage extends StatelessWidget {
 }
 
 class _Sidebar extends StatelessWidget {
-  const _Sidebar({required this.isDark});
+  const _Sidebar({
+    required this.isDark,
+    required this.loginSelected,
+    required this.onOpenLoginDemo,
+  });
 
   final bool isDark;
+  final bool loginSelected;
+  final VoidCallback onOpenLoginDemo;
 
   @override
   Widget build(BuildContext context) {
@@ -233,6 +265,12 @@ class _Sidebar extends StatelessWidget {
           ),
           const SizedBox(height: 36),
           _NavItem(
+            icon: Icons.login_rounded,
+            label: 'Login (demo)',
+            selected: loginSelected,
+            onTap: onOpenLoginDemo,
+          ),
+          _NavItem(
             icon: Icons.dashboard_outlined,
             label: 'Visão geral',
             selected: true,
@@ -266,11 +304,13 @@ class _NavItem extends StatelessWidget {
     required this.icon,
     required this.label,
     this.selected = false,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -282,6 +322,7 @@ class _NavItem extends StatelessWidget {
         borderRadius: TomathicsRadius.smAll,
         child: ListTile(
           dense: true,
+          onTap: onTap,
           leading: Icon(
             icon,
             size: 19,
@@ -300,10 +341,17 @@ class _NavItem extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.isDark, required this.onThemeChanged});
+  const _TopBar({
+    required this.isDark,
+    required this.onThemeChanged,
+    required this.onOpenLoginDemo,
+    required this.showLoginAction,
+  });
 
   final bool isDark;
   final ValueChanged<bool> onThemeChanged;
+  final VoidCallback onOpenLoginDemo;
+  final bool showLoginAction;
 
   @override
   Widget build(BuildContext context) {
@@ -323,13 +371,24 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 10),
           Text('Design system', style: Theme.of(context).textTheme.titleSmall),
           const Spacer(),
-          Text(
-            'TEMA',
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: palette.onSurfaceVariant),
-          ),
-          const SizedBox(width: 8),
+          if (showLoginAction) ...[
+            IconButton(
+              key: const ValueKey('open-login-demo'),
+              onPressed: onOpenLoginDemo,
+              tooltip: 'Demonstração de login',
+              icon: const Icon(Icons.login_rounded),
+            ),
+            const SizedBox(width: 4),
+          ],
+          if (!compact) ...[
+            Text(
+              'TEMA',
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: palette.onSurfaceVariant),
+            ),
+            const SizedBox(width: 8),
+          ],
           Icon(
             isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
             size: 18,

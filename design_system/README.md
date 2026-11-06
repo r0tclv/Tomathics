@@ -16,7 +16,9 @@ flutter run
 O seletor no canto superior alterna entre os temas. A galeria também inclui
 ícones agrupados, todos os tipos de nó, estados de execução, formulários,
 controles interativos, estados vazio/erro/offline, métricas e exemplos
-executáveis de diálogo, snackbar e painel inferior.
+executáveis de diálogo, snackbar e painel inferior. A navegação **Login (demo)**
+abre uma tela de acesso visual com exemplos de senha incorreta, Caps Lock e
+campos vazios; nenhum dado é autenticado e o botão **Entrar** retorna à galeria.
 
 ## Usar no app
 

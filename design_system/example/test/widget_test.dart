@@ -39,4 +39,62 @@ void main() {
     expect(find.text('Construa fluxos.\nEnxergue o sistema.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('login demo previews states and enters without validation', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TomathicsGalleryApp());
+    await tester.tap(find.byKey(const ValueKey('open-login-demo')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Acesse seu workspace'), findsOneWidget);
+    expect(
+      find.text('Demonstração visual: nenhuma credencial é validada.'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('login-preview-incorrect')),
+    );
+    await tester.tap(find.byKey(const ValueKey('login-preview-incorrect')));
+    await tester.pumpAndSettle();
+    expect(find.text('Senha incorreta.'), findsOneWidget);
+    expect(find.text('Não foi possível entrar'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('login-preview-capslock')),
+    );
+    await tester.tap(find.byKey(const ValueKey('login-preview-capslock')));
+    await tester.pumpAndSettle();
+    expect(find.text('Caps Lock ativado'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('login-demo-submit')));
+    await tester.tap(find.byKey(const ValueKey('login-demo-submit')));
+    await tester.pump();
+    expect(find.text('Design system'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('login demo renders on the desktop layout', (tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TomathicsGalleryApp());
+    await tester.tap(find.text('Login (demo)'));
+    await tester.pump();
+
+    expect(find.text('Seu próximo fluxo começa aqui.'), findsOneWidget);
+    expect(find.text('Acesse seu workspace'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
