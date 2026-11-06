@@ -4,9 +4,20 @@ import '../theme/tomathics_semantic_colors.dart';
 import '../tokens/tomathics_radius.dart';
 import '../tokens/tomathics_spacing.dart';
 import '../tokens/tomathics_typography.dart';
+import '../tokens/tomathics_icons.dart';
+import '../tokens/tomathics_elevation.dart';
 import 'tomathics_status_badge.dart';
 
-enum AutomationNodeKind { scene, condition, action, wait, flow }
+enum AutomationNodeKind {
+  trigger,
+  scene,
+  observe,
+  condition,
+  action,
+  wait,
+  repeat,
+  flow,
+}
 
 /// Node primitive for the visual automation editor.
 class AutomationNodeCard extends StatelessWidget {
@@ -34,29 +45,44 @@ class AutomationNodeCard extends StatelessWidget {
     final semantic = Theme.of(context).extension<TomathicsSemanticColors>()!;
     final palette = Theme.of(context).colorScheme;
     final (accent, icon, kindLabel) = switch (kind) {
+      AutomationNodeKind.trigger => (
+        semantic.nodeTrigger,
+        TomathicsIcons.nodes.trigger,
+        'GATILHO',
+      ),
       AutomationNodeKind.scene => (
         semantic.nodeScene,
-        Icons.crop_free_rounded,
+        TomathicsIcons.nodes.scene,
         'CENA',
+      ),
+      AutomationNodeKind.observe => (
+        semantic.nodeObserve,
+        TomathicsIcons.nodes.observe,
+        'OBSERVAR',
       ),
       AutomationNodeKind.condition => (
         semantic.nodeCondition,
-        Icons.rule_rounded,
+        TomathicsIcons.nodes.condition,
         'CONDIÇÃO',
       ),
       AutomationNodeKind.action => (
         semantic.nodeAction,
-        Icons.touch_app_rounded,
+        TomathicsIcons.nodes.action,
         'AÇÃO',
       ),
       AutomationNodeKind.wait => (
         semantic.nodeWait,
-        Icons.hourglass_bottom_rounded,
+        TomathicsIcons.nodes.wait,
         'ESPERA',
+      ),
+      AutomationNodeKind.repeat => (
+        semantic.nodeRepeat,
+        TomathicsIcons.nodes.repeat,
+        'REPETIR',
       ),
       AutomationNodeKind.flow => (
         semantic.nodeFlow,
-        Icons.account_tree_rounded,
+        TomathicsIcons.nodes.flow,
         'FLUXO',
       ),
     };
@@ -74,13 +100,8 @@ class AutomationNodeCard extends StatelessWidget {
               width: selected ? 1.5 : 1,
             ),
             boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: palette.primary.withValues(alpha: 0.16),
-                      blurRadius: 18,
-                    ),
-                  ]
-                : null,
+                ? TomathicsElevation.focus(palette.primary)
+                : TomathicsElevation.none,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

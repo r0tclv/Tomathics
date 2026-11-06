@@ -48,17 +48,22 @@ class GalleryPage extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          if (width >= 900) _Sidebar(isDark: isDark),
+          if (width >= TomathicsLayout.expandedBreakpoint)
+            _Sidebar(isDark: isDark),
           Expanded(
             child: Column(
               children: [
                 _TopBar(isDark: isDark, onThemeChanged: onThemeChanged),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.all(width < 600 ? 16 : 32),
+                    padding: EdgeInsets.all(
+                      width < TomathicsLayout.compactBreakpoint ? 16 : 32,
+                    ),
                     child: Center(
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1120),
+                        constraints: const BoxConstraints(
+                          maxWidth: TomathicsLayout.wideContentMax,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -120,6 +125,55 @@ class GalleryPage extends StatelessWidget {
                               child: const _ActionSamples(),
                             ),
                             const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Todos os estados',
+                              subtitle:
+                                  'Estados de execução, conexão, vazio, busca, erro e permissão.',
+                              child: _StateSamples(),
+                            ),
+                            const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Formulários e controles',
+                              subtitle:
+                                  'Campos, validação, busca, seleção, toggles e ajustes.',
+                              child: _InputSamples(),
+                            ),
+                            const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Métricas e carregamento',
+                              subtitle:
+                                  'Resumo operacional e placeholders para conteúdo assíncrono.',
+                              child: _MetricSamples(),
+                            ),
+                            const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Iconografia',
+                              subtitle:
+                                  'Catálogo nomeado para navegação, nós, estados, alvos e ações.',
+                              child: _IconSamples(),
+                            ),
+                            const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Diálogos e notificações',
+                              subtitle:
+                                  'Exemplos executáveis de snackbar, confirmação e painel inferior.',
+                              child: _OverlaySamples(),
+                            ),
+                            const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Atividade, tabelas e atalhos',
+                              subtitle:
+                                  'Histórico de execução, receitas em tabela e comandos do editor.',
+                              child: _ActivitySamples(),
+                            ),
+                            const SizedBox(height: 24),
+                            const _Section(
+                              title: 'Escalas e layouts',
+                              subtitle:
+                                  'Ritmo, cantos, elevação e breakpoints para manter consistência.',
+                              child: _ScaleSamples(),
+                            ),
+                            const SizedBox(height: 24),
                             Text(
                               'TOMATHICS  /  DESIGN SYSTEM  /  V0.1',
                               style: Theme.of(context).textTheme.labelSmall
@@ -149,7 +203,7 @@ class _Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = Theme.of(context).colorScheme;
     return Container(
-      width: 236,
+      width: TomathicsLayout.desktopSidebar,
       decoration: BoxDecoration(
         color: palette.surface,
         border: Border(right: BorderSide(color: palette.outlineVariant)),
@@ -190,16 +244,16 @@ class _Sidebar extends StatelessWidget {
           const Spacer(),
           Text(
             isDark ? 'DARK MODE' : 'LIGHT MODE',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: palette.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: palette.onSurfaceVariant),
           ),
           const SizedBox(height: 8),
           Text(
             'Editor visual de automações',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: palette.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: palette.onSurfaceVariant),
           ),
         ],
       ),
@@ -223,21 +277,21 @@ class _NavItem extends StatelessWidget {
     final palette = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
-      decoration: BoxDecoration(
+      child: Material(
         color: selected ? palette.primaryContainer : Colors.transparent,
         borderRadius: TomathicsRadius.smAll,
-      ),
-      child: ListTile(
-        dense: true,
-        leading: Icon(
-          icon,
-          size: 19,
-          color: selected ? palette.primary : palette.onSurfaceVariant,
-        ),
-        title: Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: selected ? palette.primary : palette.onSurface,
+        child: ListTile(
+          dense: true,
+          leading: Icon(
+            icon,
+            size: 19,
+            color: selected ? palette.primary : palette.onSurfaceVariant,
+          ),
+          title: Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: selected ? palette.primary : palette.onSurface,
+            ),
           ),
         ),
       ),
@@ -254,9 +308,11 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Theme.of(context).colorScheme;
+    final compact =
+        MediaQuery.sizeOf(context).width < TomathicsLayout.compactBreakpoint;
     return Container(
       height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: compact ? 12 : 24),
       decoration: BoxDecoration(
         color: palette.surface,
         border: Border(bottom: BorderSide(color: palette.outlineVariant)),
@@ -265,16 +321,13 @@ class _TopBar extends StatelessWidget {
         children: [
           Icon(Icons.grid_view_rounded, size: 18, color: palette.primary),
           const SizedBox(width: 10),
-          Text(
-            'Design system',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
+          Text('Design system', style: Theme.of(context).textTheme.titleSmall),
           const Spacer(),
           Text(
             'TEMA',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: palette.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: palette.onSurfaceVariant),
           ),
           const SizedBox(width: 8),
           Icon(
@@ -282,7 +335,11 @@ class _TopBar extends StatelessWidget {
             size: 18,
             color: palette.onSurfaceVariant,
           ),
-          Switch(value: isDark, onChanged: onThemeChanged),
+          Switch(
+            key: const ValueKey('theme-mode-switch'),
+            value: isDark,
+            onChanged: onThemeChanged,
+          ),
         ],
       ),
     );
@@ -306,9 +363,9 @@ class _PageHeading extends StatelessWidget {
             children: [
               Text(
                 'SISTEMA DE DESIGN  /  2026',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: palette.secondary,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(color: palette.secondary),
               ),
               const SizedBox(height: 10),
               Text(
@@ -476,14 +533,27 @@ class _ColorSamples extends StatelessWidget {
     final semantic = TomathicsTheme.semantic(context);
     final samples = <(String, Color)>[
       ('Primária', palette.primary),
+      ('Primária · fundo', palette.primaryContainer),
       ('Ciano', palette.secondary),
+      ('Fundo', palette.surface),
+      ('Superfície', palette.surfaceContainerHighest),
+      ('Superfície baixa', palette.surfaceContainerLow),
+      ('Texto principal', palette.onSurface),
+      ('Texto secundário', palette.onSurfaceVariant),
+      ('Borda', palette.outlineVariant),
+      ('Informação', semantic.info),
       ('Concluído', semantic.success),
       ('Atenção', semantic.warning),
       ('Falha', semantic.danger),
+      ('Neutro', semantic.neutral),
+      ('Gatilho', semantic.nodeTrigger),
       ('Cena', semantic.nodeScene),
+      ('Observar', semantic.nodeObserve),
       ('Condição', semantic.nodeCondition),
       ('Ação', semantic.nodeAction),
       ('Espera', semantic.nodeWait),
+      ('Repetir', semantic.nodeRepeat),
+      ('Fluxo', semantic.nodeFlow),
     ];
     return Wrap(
       spacing: 10,
@@ -535,17 +605,61 @@ class _TypeSamples extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Display · 36 / 700', style: Theme.of(context).textTheme.displayLarge),
-          Text(
-            'Headline · 24 / 650',
+          _TypeSample(
+            role: 'Display · 36 / 700',
+            style: Theme.of(context).textTheme.displayLarge,
+          ),
+          _TypeSample(
+            role: 'Headline large · 30 / 700',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          _TypeSample(
+            role: 'Headline medium · 24 / 600',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          Text('Título · 18 / 600', style: Theme.of(context).textTheme.titleLarge),
-          Text(
-            'Texto de leitura · 14 / 400',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: palette.onSurfaceVariant,
-            ),
+          _TypeSample(
+            role: 'Headline small · 20 / 600',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          _TypeSample(
+            role: 'Title large · 18 / 600',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          _TypeSample(
+            role: 'Title medium · 16 / 600',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          _TypeSample(
+            role: 'Title small · 14 / 600',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          _TypeSample(
+            role: 'Body large · 16 / 400',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          _TypeSample(
+            role: 'Body medium · 14 / 400',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: palette.onSurfaceVariant),
+          ),
+          _TypeSample(
+            role: 'Body small · 12 / 400',
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: palette.onSurfaceVariant),
+          ),
+          _TypeSample(
+            role: 'Label large · 14 / 600',
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+          _TypeSample(
+            role: 'Label medium · 12 / 600',
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+          _TypeSample(
+            role: 'Label small · 11 / 700',
+            style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8),
           Text(
@@ -554,6 +668,21 @@ class _TypeSamples extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TypeSample extends StatelessWidget {
+  const _TypeSample({required this.role, required this.style});
+
+  final String role;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: TomathicsSpacing.sm),
+      child: Text('$role  ·  Tomathics', style: style),
     );
   }
 }
@@ -773,6 +902,907 @@ class _ActionSamples extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StateSamples extends StatelessWidget {
+  const _StateSamples();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TomathicsPanel(
+          title: 'Estados do motor',
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final status in TomathicsStatus.values)
+                TomathicsStatusBadge(status: status),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final itemWidth = constraints.maxWidth < 620
+                ? constraints.maxWidth
+                : (constraints.maxWidth - 16) / 2;
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                for (final state in TomathicsViewState.values)
+                  SizedBox(
+                    width: itemWidth,
+                    height: 300,
+                    child: TomathicsPanel(
+                      padding: EdgeInsets.zero,
+                      child: TomathicsStateView(
+                        state: state,
+                        actionLabel: switch (state) {
+                          TomathicsViewState.loading => null,
+                          TomathicsViewState.empty => 'Criar receita',
+                          TomathicsViewState.noResults => 'Limpar busca',
+                          TomathicsViewState.error => 'Tentar novamente',
+                          TomathicsViewState.offline => 'Ver conexão',
+                          TomathicsViewState.permissionRequired =>
+                            'Abrir permissões',
+                        },
+                        onAction: _noop,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+        for (final tone in TomathicsBannerTone.values) ...[
+          TomathicsMessageBanner(
+            title: switch (tone) {
+              TomathicsBannerTone.info => 'Leitura da tela',
+              TomathicsBannerTone.success => 'Objetivo concluído',
+              TomathicsBannerTone.warning => 'Receita bloqueada',
+              TomathicsBannerTone.danger => 'Motor indisponível',
+            },
+            message: switch (tone) {
+              TomathicsBannerTone.info => 'Estoque atualizado há 40 segundos.',
+              TomathicsBannerTone.success =>
+                'Os 10 sanduíches foram produzidos.',
+              TomathicsBannerTone.warning =>
+                'Falta queijo e nenhuma receita o produz.',
+              TomathicsBannerTone.danger =>
+                'A conexão com o computador foi interrompida.',
+            },
+            tone: tone,
+            actionLabel: tone == TomathicsBannerTone.warning
+                ? 'Ver dependências'
+                : null,
+            onAction: _noop,
+          ),
+          if (tone != TomathicsBannerTone.danger)
+            const SizedBox(height: TomathicsSpacing.sm),
+        ],
+        const SizedBox(height: 16),
+        Text('Variações de nó', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final kind in AutomationNodeKind.values) ...[
+                AutomationNodeCard(
+                  title: switch (kind) {
+                    AutomationNodeKind.trigger => 'Quando ficar pronto',
+                    AutomationNodeKind.scene => 'Ler tela',
+                    AutomationNodeKind.observe => 'Localizar padaria',
+                    AutomationNodeKind.condition => 'Estoque ≥ 3',
+                    AutomationNodeKind.action => 'Colher trigo',
+                    AutomationNodeKind.wait => 'Aguardar 3:20',
+                    AutomationNodeKind.repeat => 'Manter estoque',
+                    AutomationNodeKind.flow => 'Executar receita',
+                  },
+                  kind: kind,
+                  hasInput: kind != AutomationNodeKind.trigger,
+                  hasOutput: kind != AutomationNodeKind.action,
+                  status: switch (kind) {
+                    AutomationNodeKind.trigger => TomathicsStatus.idle,
+                    AutomationNodeKind.scene => TomathicsStatus.completed,
+                    AutomationNodeKind.observe => TomathicsStatus.running,
+                    AutomationNodeKind.condition => TomathicsStatus.attention,
+                    AutomationNodeKind.action => TomathicsStatus.failed,
+                    AutomationNodeKind.wait => TomathicsStatus.waiting,
+                    AutomationNodeKind.repeat => TomathicsStatus.paused,
+                    AutomationNodeKind.flow => TomathicsStatus.blocked,
+                  },
+                ),
+                const SizedBox(width: 20),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'A idade da leitura é um estado do produto: dados antigos nunca devem parecer atuais.',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: palette.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+}
+
+class _InputSamples extends StatefulWidget {
+  const _InputSamples();
+
+  @override
+  State<_InputSamples> createState() => _InputSamplesState();
+}
+
+class _InputSamplesState extends State<_InputSamples> {
+  final _formKey = GlobalKey<FormState>();
+  final _targetController = TextEditingController(text: 'Hay Day · Fazenda');
+  String _selectedLayout = 'Editor';
+  bool _keepRunning = true;
+  bool _showOnlyActive = true;
+  bool _verifyBeforeRun = true;
+  double _scanInterval = 3;
+  String _selectedFilter = 'Ativas';
+  bool _hasErrors = false;
+
+  @override
+  void dispose() {
+    _targetController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Theme.of(context).colorScheme;
+    return TomathicsPanel(
+      title: 'Configurar alvo',
+      subtitle:
+          'Exemplos editáveis; valide campos antes de iniciar uma receita.',
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = constraints.maxWidth < 620 ? 1 : 2;
+                final fieldWidth =
+                    (constraints.maxWidth - (columns - 1) * 16) / columns;
+                return Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: [
+                    SizedBox(
+                      width: fieldWidth,
+                      child: TomathicsTextField(
+                        label: 'Nome do alvo',
+                        controller: _targetController,
+                        hint: 'Ex.: Fazenda principal',
+                        helperText: 'Identifique o app ou a janela.',
+                        required: true,
+                        prefixIcon: const Icon(Icons.label_outline_rounded),
+                        textInputAction: TextInputAction.next,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Informe um nome para o alvo.'
+                            : null,
+                      ),
+                    ),
+                    SizedBox(
+                      width: fieldWidth,
+                      child: TomathicsTextField(
+                        label: 'Janela ou endereço',
+                        hint: 'http://localhost:8080',
+                        prefixIcon: const Icon(Icons.link_rounded),
+                        keyboardType: TextInputType.url,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            TomathicsTextField(
+              label: 'Buscar receita',
+              hint: 'Buscar por nome, ingrediente ou alvo',
+              prefixIcon: const Icon(Icons.search_rounded),
+              suffixIcon: IconButton(
+                tooltip: 'Filtros',
+                onPressed: _noop,
+                icon: const Icon(Icons.filter_list_rounded),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                FilterChip(
+                  label: const Text('Ativas'),
+                  avatar: const Icon(Icons.play_arrow_rounded, size: 16),
+                  selected: _showOnlyActive,
+                  onSelected: (value) => setState(() {
+                    _showOnlyActive = value;
+                  }),
+                ),
+                const InputChip(
+                  label: Text('Hay Day'),
+                  avatar: Icon(Icons.phone_android_rounded, size: 16),
+                  onDeleted: _noop,
+                ),
+                ChoiceChip(
+                  label: const Text('Pausadas'),
+                  selected: _selectedFilter == 'Pausadas',
+                  onSelected: (value) => setState(() {
+                    _selectedFilter = value ? 'Pausadas' : 'Ativas';
+                  }),
+                ),
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'Editor', label: Text('Editor')),
+                    ButtonSegment(value: 'Monitor', label: Text('Monitor')),
+                  ],
+                  selected: {_selectedLayout},
+                  onSelectionChanged: (value) =>
+                      setState(() => _selectedLayout = value.first),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Manter rotina ativa'),
+              subtitle: const Text('Executar até ser pausada.'),
+              value: _keepRunning,
+              onChanged: (value) => setState(() => _keepRunning = value),
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              title: const Text('Revisar plano antes de executar'),
+              value: _verifyBeforeRun,
+              onChanged: (value) =>
+                  setState(() => _verifyBeforeRun = value ?? false),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Intervalo de leitura',
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ),
+                Text(
+                  '${_scanInterval.round()} s',
+                  style: TomathicsTypography.code.copyWith(
+                    color: palette.primary,
+                  ),
+                ),
+              ],
+            ),
+            Slider(
+              value: _scanInterval,
+              min: 1,
+              max: 10,
+              divisions: 9,
+              label: '${_scanInterval.round()} s',
+              onChanged: (value) => setState(() => _scanInterval = value),
+            ),
+            if (_hasErrors)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'Revise os campos obrigatórios antes de continuar.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: palette.error),
+                ),
+              ),
+            TomathicsButton(
+              label: 'Validar formulário',
+              icon: Icons.check_rounded,
+              onPressed: () {
+                final isValid = _formKey.currentState!.validate();
+                setState(() => _hasErrors = !isValid);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MetricSamples extends StatelessWidget {
+  const _MetricSamples();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: const [
+            TomathicsMetricCard(
+              label: 'Objetivos ativos',
+              value: '04',
+              icon: Icons.flag_outlined,
+              detail: '+2 nesta sessão',
+              trend: TomathicsMetricTrend.positive,
+            ),
+            TomathicsMetricCard(
+              label: 'Rotinas',
+              value: '08',
+              icon: Icons.bolt_outlined,
+              detail: '3 aguardando',
+            ),
+            TomathicsMetricCard(
+              label: 'Falhas hoje',
+              value: '01',
+              icon: Icons.error_outline_rounded,
+              detail: '1 requer atenção',
+              trend: TomathicsMetricTrend.negative,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        TomathicsPanel(
+          title: 'Carregando receitas',
+          subtitle:
+              'Placeholders reservam o espaço e reduzem mudanças de layout.',
+          child: Row(
+            children: [
+              TomathicsSkeleton(
+                width: 44,
+                height: 44,
+                radius: TomathicsRadius.pill,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TomathicsSkeleton(width: 190, height: 14),
+                    SizedBox(height: 10),
+                    TomathicsSkeleton(width: 260, height: 10),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.hourglass_top_rounded,
+                color: palette.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _IconSamples extends StatelessWidget {
+  const _IconSamples();
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = <(String, List<(String, IconData)>)>[
+      (
+        'NAVEGAÇÃO',
+        [
+          ('Visão geral', TomathicsIcons.navigation.overview),
+          ('Editor', TomathicsIcons.navigation.editor),
+          ('Receitas', TomathicsIcons.navigation.recipes),
+          ('Objetivos', TomathicsIcons.navigation.objectives),
+          ('Monitor', TomathicsIcons.navigation.monitor),
+          ('Rotinas', TomathicsIcons.navigation.routines),
+          ('Alvos', TomathicsIcons.navigation.targets),
+          ('Cenas', TomathicsIcons.navigation.scenes),
+          ('Ajustes', TomathicsIcons.navigation.settings),
+          ('Ajuda', TomathicsIcons.navigation.help),
+          ('Avisos', TomathicsIcons.navigation.notifications),
+          ('Histórico', TomathicsIcons.navigation.history),
+        ],
+      ),
+      (
+        'NÓS',
+        [
+          ('Gatilho', TomathicsIcons.nodes.trigger),
+          ('Cena', TomathicsIcons.nodes.scene),
+          ('Observar', TomathicsIcons.nodes.observe),
+          ('Condição', TomathicsIcons.nodes.condition),
+          ('Ação', TomathicsIcons.nodes.action),
+          ('Espera', TomathicsIcons.nodes.wait),
+          ('Repetir', TomathicsIcons.nodes.repeat),
+          ('Fluxo', TomathicsIcons.nodes.flow),
+          ('Ramificação', TomathicsIcons.nodes.branch),
+          ('Variável', TomathicsIcons.nodes.variable),
+        ],
+      ),
+      (
+        'ESTADOS',
+        [
+          ('Executando', TomathicsIcons.states.running),
+          ('Concluído', TomathicsIcons.states.completed),
+          ('Aguardando', TomathicsIcons.states.waiting),
+          ('Pausado', TomathicsIcons.states.paused),
+          ('Atenção', TomathicsIcons.states.attention),
+          ('Falhou', TomathicsIcons.states.failed),
+          ('Bloqueado', TomathicsIcons.states.blocked),
+          ('Desconectado', TomathicsIcons.states.disconnected),
+          ('Desatualizado', TomathicsIcons.states.stale),
+          ('Inativo', TomathicsIcons.states.idle),
+          ('Carregando', TomathicsIcons.states.loading),
+        ],
+      ),
+      (
+        'ALVOS E RECURSOS',
+        [
+          ('Desktop', TomathicsIcons.targets.desktop),
+          ('Navegador', TomathicsIcons.targets.browser),
+          ('Emulador', TomathicsIcons.targets.emulator),
+          ('Janela', TomathicsIcons.targets.window),
+          ('Conectado', TomathicsIcons.targets.connected),
+          ('Desconectado', TomathicsIcons.targets.disconnected),
+          ('Capturar', TomathicsIcons.targets.capture),
+          ('Localizar', TomathicsIcons.targets.locate),
+          ('Entrada', TomathicsIcons.resources.input),
+          ('Saída', TomathicsIcons.resources.output),
+          ('Estoque', TomathicsIcons.resources.inventory),
+          ('Tempo', TomathicsIcons.resources.time),
+          ('Máquina', TomathicsIcons.resources.machine),
+          ('Cena-alvo', TomathicsIcons.resources.scene),
+          ('Entidade', TomathicsIcons.resources.entity),
+          ('Dependência', TomathicsIcons.resources.dependency),
+        ],
+      ),
+      (
+        'AÇÕES',
+        [
+          ('Adicionar', TomathicsIcons.actions.add),
+          ('Editar', TomathicsIcons.actions.edit),
+          ('Duplicar', TomathicsIcons.actions.duplicate),
+          ('Excluir', TomathicsIcons.actions.delete),
+          ('Buscar', TomathicsIcons.actions.search),
+          ('Filtrar', TomathicsIcons.actions.filter),
+          ('Ordenar', TomathicsIcons.actions.sort),
+          ('Executar', TomathicsIcons.actions.play),
+          ('Pausar', TomathicsIcons.actions.pause),
+          ('Parar', TomathicsIcons.actions.stop),
+          ('Atualizar', TomathicsIcons.actions.refresh),
+          ('Mais', TomathicsIcons.actions.more),
+          ('Voltar', TomathicsIcons.actions.back),
+          ('Avançar', TomathicsIcons.actions.forward),
+          ('Expandir', TomathicsIcons.actions.expand),
+          ('Abrir link', TomathicsIcons.actions.externalLink),
+          ('Fechar', TomathicsIcons.actions.close),
+          ('Mostrar', TomathicsIcons.actions.visibility),
+          ('Ocultar', TomathicsIcons.actions.visibilityOff),
+        ],
+      ),
+    ];
+
+    return Column(
+      children: [
+        for (final (title, icons) in groups) ...[
+          TomathicsPanel(
+            title: title,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final (label, icon) in icons)
+                  SizedBox(
+                    width: 140,
+                    child: Tooltip(
+                      message: label,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerLow,
+                          borderRadius: TomathicsRadius.smAll,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(icon, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                label,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _OverlaySamples extends StatelessWidget {
+  const _OverlaySamples();
+
+  @override
+  Widget build(BuildContext context) {
+    return TomathicsPanel(
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          TomathicsButton(
+            label: 'Mostrar snackbar',
+            icon: Icons.notifications_outlined,
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Plano salvo com sucesso.'),
+                action: SnackBarAction(label: 'DESFAZER', onPressed: _noop),
+              ),
+            ),
+          ),
+          TomathicsButton(
+            label: 'Abrir confirmação',
+            variant: TomathicsButtonVariant.outline,
+            icon: Icons.warning_amber_rounded,
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (context) => AlertDialog(
+                icon: const Icon(Icons.stop_circle_outlined),
+                title: const Text('Cancelar objetivo?'),
+                content: const Text(
+                  'O plano será interrompido. Essa ação não apaga a receita.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Continuar'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar objetivo'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          TomathicsButton(
+            label: 'Abrir painel inferior',
+            variant: TomathicsButtonVariant.quiet,
+            icon: Icons.expand_less_rounded,
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              showDragHandle: true,
+              builder: (context) => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(TomathicsSpacing.xxl),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Pré-visualização do plano',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text('3 receitas · 30 itens reservados'),
+                      const SizedBox(height: 16),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Entendi'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivitySamples extends StatelessWidget {
+  const _ActivitySamples();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TomathicsPanel(
+          title: 'Atividade recente',
+          subtitle: 'Eventos do motor em ordem cronológica.',
+          child: const Column(
+            children: [
+              TomathicsActivityTile(
+                title: 'Pão produzido',
+                detail: 'Padaria · objetivo #12 · lote 4/10',
+                time: 'há 2 min',
+                icon: Icons.task_alt_rounded,
+                status: TomathicsStatus.completed,
+              ),
+              Divider(),
+              TomathicsActivityTile(
+                title: 'Aguardando espaço',
+                detail: 'A máquina está ocupada até 14:32.',
+                time: 'há 3 min',
+                icon: Icons.hourglass_bottom_rounded,
+                status: TomathicsStatus.waiting,
+              ),
+              Divider(),
+              TomathicsActivityTile(
+                title: 'Leitura desatualizada',
+                detail: 'O estoque não é confirmado há 40 segundos.',
+                time: 'há 4 min',
+                icon: Icons.visibility_outlined,
+                status: TomathicsStatus.stale,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        TomathicsPanel(
+          title: 'Biblioteca de receitas',
+          subtitle: 'Tabela de desktop com estado e última execução.',
+          padding: EdgeInsets.zero,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: const [
+                DataColumn(label: Text('Receita')),
+                DataColumn(label: Text('Alvo')),
+                DataColumn(label: Text('Estado')),
+                DataColumn(label: Text('Execuções'), numeric: true),
+                DataColumn(label: Text('Última vez')),
+              ],
+              rows: const [
+                DataRow(
+                  cells: [
+                    DataCell(Text('Fazer pão')),
+                    DataCell(Text('Hay Day')),
+                    DataCell(
+                      TomathicsStatusBadge(status: TomathicsStatus.running),
+                    ),
+                    DataCell(Text('28')),
+                    DataCell(Text('há 2 min')),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Colher trigo')),
+                    DataCell(Text('Hay Day')),
+                    DataCell(
+                      TomathicsStatusBadge(status: TomathicsStatus.completed),
+                    ),
+                    DataCell(Text('104')),
+                    DataCell(Text('há 5 min')),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Montar sanduíche')),
+                    DataCell(Text('Hay Day')),
+                    DataCell(
+                      TomathicsStatusBadge(status: TomathicsStatus.blocked),
+                    ),
+                    DataCell(Text('0')),
+                    DataCell(Text('nunca')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TomathicsPanel(
+          title: 'Atalhos do editor',
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 12,
+            children: const [
+              TomathicsShortcutHint(
+                keys: ['Ctrl', 'S'],
+                label: 'Salvar receita',
+              ),
+              TomathicsShortcutHint(keys: ['Ctrl', 'Z'], label: 'Desfazer'),
+              TomathicsShortcutHint(
+                keys: ['Ctrl', 'Shift', 'Z'],
+                label: 'Refazer',
+              ),
+              TomathicsShortcutHint(keys: ['Ctrl', 'K'], label: 'Buscar nó'),
+              TomathicsShortcutHint(keys: ['Delete'], label: 'Remover seleção'),
+              TomathicsShortcutHint(
+                keys: ['Space', 'Drag'],
+                label: 'Mover canvas',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Atalhos são affordances: documente-os em menus e tooltips e permita operação equivalente por mouse e toque.',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: palette.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+}
+
+class _ScaleSamples extends StatelessWidget {
+  const _ScaleSamples();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Theme.of(context).colorScheme;
+    final spaces = <(String, double)>[
+      ('xs', TomathicsSpacing.xs),
+      ('sm', TomathicsSpacing.sm),
+      ('md', TomathicsSpacing.md),
+      ('lg', TomathicsSpacing.lg),
+      ('xl', TomathicsSpacing.xl),
+      ('xxl', TomathicsSpacing.xxl),
+      ('xxxl', TomathicsSpacing.xxxl),
+    ];
+    final radii = <(String, double)>[
+      ('xs', TomathicsRadius.xs),
+      ('sm', TomathicsRadius.sm),
+      ('md', TomathicsRadius.md),
+      ('lg', TomathicsRadius.lg),
+      ('xl', TomathicsRadius.xl),
+      ('pill', TomathicsRadius.pill),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TomathicsPanel(
+          title: 'Espaçamento · grade de 4 px',
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            crossAxisAlignment: WrapCrossAlignment.end,
+            children: [
+              for (final (label, size) in spaces)
+                Column(
+                  children: [
+                    Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        color: palette.primary,
+                        borderRadius: TomathicsRadius.xsAll,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$label · ${size.toInt()}',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        TomathicsPanel(
+          title: 'Cantos e elevação',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final (label, radius) in radii)
+                Container(
+                  width: 88,
+                  height: 56,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: palette.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(radius),
+                    border: Border.all(color: palette.outlineVariant),
+                    boxShadow: radius == TomathicsRadius.lg
+                        ? TomathicsElevation.panel
+                        : null,
+                  ),
+                  child: Text(
+                    '$label · ${radius.toInt()}',
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              Container(
+                width: 110,
+                height: 56,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: TomathicsRadius.mdAll,
+                  boxShadow: TomathicsElevation.floating,
+                ),
+                child: Text(
+                  'Flutuante',
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        TomathicsPanel(
+          title: 'Breakpoints de layout',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _BreakpointChip(
+                name: 'Compacto',
+                width: TomathicsLayout.compactBreakpoint,
+              ),
+              _BreakpointChip(
+                name: 'Expandido',
+                width: TomathicsLayout.expandedBreakpoint,
+              ),
+              _BreakpointChip(
+                name: 'Largo',
+                width: TomathicsLayout.wideBreakpoint,
+              ),
+              _BreakpointChip(
+                name: 'Conteúdo máx.',
+                width: TomathicsLayout.wideContentMax,
+              ),
+              _BreakpointChip(
+                name: 'Inspetor',
+                width: TomathicsLayout.inspectorPanel,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BreakpointChip extends StatelessWidget {
+  const _BreakpointChip({required this.name, required this.width});
+
+  final String name;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: const Icon(Icons.width_wide_rounded, size: 16),
+      label: Text('$name · ${width.toInt()} px'),
     );
   }
 }

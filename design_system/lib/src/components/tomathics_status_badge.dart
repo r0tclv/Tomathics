@@ -12,6 +12,9 @@ enum TomathicsStatus {
   attention,
   failed,
   idle,
+  blocked,
+  disconnected,
+  stale,
 }
 
 /// Labeled state with both icon and color, so status is never color-only.
@@ -72,6 +75,24 @@ class TomathicsStatusBadge extends StatelessWidget {
         colors.neutralContainer,
         Icons.circle_outlined,
         'Inativo',
+      ),
+      TomathicsStatus.blocked => (
+        colors.warning,
+        colors.warningContainer,
+        Icons.block_rounded,
+        'Bloqueado',
+      ),
+      TomathicsStatus.disconnected => (
+        colors.neutral,
+        colors.neutralContainer,
+        Icons.link_off_rounded,
+        'Desconectado',
+      ),
+      TomathicsStatus.stale => (
+        colors.warning,
+        colors.warningContainer,
+        Icons.update_rounded,
+        'Leitura desatualizada',
       ),
     };
     return Semantics(

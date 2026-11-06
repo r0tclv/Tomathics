@@ -25,52 +25,55 @@ class TomathicsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Theme.of(context).colorScheme;
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: emphasized ? palette.surfaceContainerHighest : palette.surface,
+    return Material(
+      color: emphasized ? palette.surfaceContainerHighest : palette.surface,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
         borderRadius: TomathicsRadius.lgAll,
-        border: Border.all(
+        side: BorderSide(
           color: emphasized
               ? palette.primary.withValues(alpha: 0.35)
               : palette.outlineVariant,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (title != null || action != null) ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (title case final heading?)
-                        Text(
-                          heading,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      if (subtitle case final panelSubtitle?) ...[
-                        const SizedBox(height: TomathicsSpacing.xs),
-                        Text(
-                          panelSubtitle,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: palette.onSurfaceVariant),
-                        ),
+      child: Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (title != null || action != null) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (title case final heading?)
+                          Text(
+                            heading,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        if (subtitle case final panelSubtitle?) ...[
+                          const SizedBox(height: TomathicsSpacing.xs),
+                          Text(
+                            panelSubtitle,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: palette.onSurfaceVariant),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                ?action,
-              ],
-            ),
-            const SizedBox(height: TomathicsSpacing.lg),
+                  ?action,
+                ],
+              ),
+              const SizedBox(height: TomathicsSpacing.lg),
+            ],
+            child,
           ],
-          child,
-        ],
+        ),
       ),
     );
   }

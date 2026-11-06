@@ -1,7 +1,9 @@
 # Tomathics Design System
 
 Pacote Flutter independente com tokens, temas claro/escuro e componentes
-iniciais para o editor visual, as receitas e o monitor de objetivos.
+reutilizáveis para o editor visual, as receitas, os alvos e o monitor de
+objetivos. `example/` é uma galeria executável e um catálogo de estados e
+padrões da interface, não apenas uma tela de demonstração.
 
 ## Abrir a galeria
 
@@ -11,9 +13,10 @@ flutter pub get
 flutter run
 ```
 
-O seletor no canto superior alterna entre os temas. A galeria demonstra cores,
-estados semânticos, tipografia, cartões de nós, contratos de receitas,
-progresso e ações.
+O seletor no canto superior alterna entre os temas. A galeria também inclui
+ícones agrupados, todos os tipos de nó, estados de execução, formulários,
+controles interativos, estados vazio/erro/offline, métricas e exemplos
+executáveis de diálogo, snackbar e painel inferior.
 
 ## Usar no app
 
@@ -65,6 +68,44 @@ Importe `package:tomathics_design_system/tomathics_design_system.dart`.
 | Espaçamento | `TomathicsSpacing` |
 | Raios | `TomathicsRadius` |
 | Movimento | `TomathicsDurations` |
+| Ícones semânticos | `TomathicsIcons.navigation`, `.nodes`, `.states`, `.actions`, `.targets`, `.resources` |
+| Breakpoints e larguras | `TomathicsLayout` |
+| Elevação | `TomathicsElevation` |
+
+## Catálogo de componentes
+
+| Componente | Para usar em |
+|---|---|
+| `TomathicsButton` | Ações primárias, secundárias, discretas e destrutivas |
+| `TomathicsTextField` | Formulários, validação e busca |
+| `TomathicsPanel` | Painéis do inspetor, biblioteca e monitor |
+| `TomathicsStatusBadge` | Estado textual e visual de execução/conexão |
+| `TomathicsMessageBanner` | Avisos, sucesso, atenção e falha com ação opcional |
+| `TomathicsStateView` | Carregando, vazio, sem resultado, erro, offline e permissão |
+| `TomathicsSkeleton` | Placeholder para dados em carregamento |
+| `TomathicsMetricCard` | Resumos e indicadores operacionais |
+| `TomathicsActivityTile` | Histórico de execução, eventos e leituras |
+| `TomathicsShortcutHint` | Teclas de atalho do editor desktop |
+| `AutomationNodeCard` | Gatilhos, cenas, observação, condições, ações, espera e repetição |
+| `AutomationCanvas` | Grade do editor e conectores entre nós |
+| `RecipeContractCard` | Insumos e produtos de uma receita |
+| `ObjectiveProgressCard` | Progresso, estimativa e idade da leitura do objetivo |
+
+## Cobertura visual na galeria
+
+- Navegação, variáveis tipográficas, paletas claro/escuro e cores semânticas.
+- Estados de motor: execução, conclusão, espera, pausa, atenção, falha,
+  inatividade, bloqueio, desconexão e leitura desatualizada.
+- Estados de tela: carregamento, vazio, busca sem resultado, erro, offline e
+  permissão necessária.
+- Nós do fluxo, mapa conectado, contratos, dependências, métricas, skeletons,
+  formulários, filtros, chips, segmented buttons, checkbox, switch e slider.
+- AlertDialog, snackbar acionável e bottom sheet.
+- Tabela desktop para biblioteca, feed de atividade e atalhos de teclado.
+
+Todos os componentes são exemplos iniciais de comportamento visual: conecte-os
+às regras e aos dados reais da aplicação, sem duplicar cores, status ou estilos
+na camada de telas.
 
 O pacote não baixa fontes nem ícones externos: mantém o build independente e
 usa os ícones Material incluídos no Flutter.
