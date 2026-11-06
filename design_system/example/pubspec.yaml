@@ -1,0 +1,22 @@
+name: tomathics_design_system_gallery
+description: Galeria do design system Tomathics.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  tomathics_design_system:
+    path: ..
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
