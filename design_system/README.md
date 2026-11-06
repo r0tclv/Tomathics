@@ -8,17 +8,32 @@ padrões da interface, não apenas uma tela de demonstração.
 ## Abrir a galeria
 
 ```powershell
-cd example
+Set-Location 'C:\dev\Tomathics\design_system\example'
 flutter pub get
-flutter run
+flutter run -d chrome
 ```
 
 O seletor no canto superior alterna entre os temas. A galeria também inclui
 ícones agrupados, todos os tipos de nó, estados de execução, formulários,
 controles interativos, estados vazio/erro/offline, métricas e exemplos
-executáveis de diálogo, snackbar e painel inferior. A navegação **Login (demo)**
-abre uma tela de acesso visual com exemplos de senha incorreta, Caps Lock e
-campos vazios; nenhum dado é autenticado e o botão **Entrar** retorna à galeria.
+executáveis de diálogo, snackbar e painel inferior.
+
+### Login (demo)
+
+A entrada **Login (demo)**, disponível na navegação da galeria, abre uma tela
+responsiva de demonstração de acesso. Ela mostra os temas claro/escuro, campos
+de e-mail e senha, alternância para exibir a senha, “Manter conectado”,
+recuperação de senha demonstrativa e exemplos selecionáveis dos estados:
+
+- padrão;
+- senha incorreta, com erro no campo e banner;
+- Caps Lock, apresentado como aviso;
+- campos vazios, com erros nos campos.
+
+Estes estados são prévias visuais selecionadas manualmente: não há validação de
+credenciais, detecção real de Caps Lock, recuperação de senha ou autenticação.
+O botão **Entrar** retorna à galeria sem validar os campos. Esta tela pertence
+ao app de exemplo e não faz parte da API pública do pacote de componentes.
 
 ## Usar no app
 
@@ -97,13 +112,37 @@ Importe `package:tomathics_design_system/tomathics_design_system.dart`.
 
 - Navegação, variáveis tipográficas, paletas claro/escuro e cores semânticas.
 - Estados de motor: execução, conclusão, espera, pausa, atenção, falha,
-  inatividade, bloqueio, desconexão e leitura desatualizada.
+  inatividade, bloqueio, desconexão e leitura desatualizada, com rótulos e
+  exemplos de ícones.
 - Estados de tela: carregamento, vazio, busca sem resultado, erro, offline e
   permissão necessária.
 - Nós do fluxo, mapa conectado, contratos, dependências, métricas, skeletons,
   formulários, filtros, chips, segmented buttons, checkbox, switch e slider.
 - AlertDialog, snackbar acionável e bottom sheet.
 - Tabela desktop para biblioteca, feed de atividade e atalhos de teclado.
+- Tela Login (demo) em layout compacto e desktop, com alternância de tema e
+  estados demonstrativos de formulário.
+
+## Validar
+
+Execute os testes e o analisador do pacote e da galeria:
+
+```powershell
+Set-Location 'C:\dev\Tomathics\design_system'
+flutter analyze
+flutter test
+
+Set-Location 'C:\dev\Tomathics\design_system\example'
+flutter analyze
+flutter test
+```
+
+Para gerar a versão web da galeria:
+
+```powershell
+Set-Location 'C:\dev\Tomathics\design_system\example'
+flutter build web
+```
 
 Todos os componentes são exemplos iniciais de comportamento visual: conecte-os
 às regras e aos dados reais da aplicação, sem duplicar cores, status ou estilos
