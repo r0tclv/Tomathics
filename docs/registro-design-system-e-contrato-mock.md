@@ -5,15 +5,17 @@
 questões ainda abertas para retomar o desenvolvimento sem confundir propostas
 com requisitos confirmados.
 
-> Este documento registra decisões e planejamento. Ele não implementa o mock,
-> uma API HTTP, autenticação ou execução de automações.
+> O contrato REST aqui descrito é uma referência, não um servidor HTTP. Uma
+> primeira implementação em memória foi iniciada em `mock_backend/`; ela não
+> autentica credenciais reais nem executa automações.
 
 ## 1. Estado atual do projeto
 
 - O Design System Flutter e sua galeria estão em `design_system/`.
 - A galeria tem temas claro e escuro, exemplos dos componentes e estados
   reutilizáveis, além de uma tela de Login demonstrativa.
-- Não há mock de backend implementado neste registro.
+- Existe agora um pacote Dart independente em `mock_backend/`, com modelos,
+  repositório em memória e cenários de execução simulados.
 - O contrato descrito aqui é uma referência REST/JSON para o futuro. A escolha
   atual para o mock de desenvolvimento é executá-lo dentro do Flutter, sem
   servidor HTTP local.
@@ -119,16 +121,17 @@ Estas escolhas foram feitas explicitamente durante a conversa:
 | Autenticação real | Fora do escopo atual |
 | Login futuro do mock | Não validar credenciais; entrada abre uma sessão fixa de demonstração |
 
-### Importante: mock em Flutter não é mock server HTTP
+### Importante: mock em memória não é mock server HTTP
 
-O mock escolhido inicialmente é uma implementação em memória dentro do processo
-Flutter. Ele pode exercitar os fluxos de tela e imitar os comportamentos
-esperados, mas não recebe requisições HTTP nem testa serialização ou transporte.
+O mock escolhido inicialmente é uma implementação em memória para ser consumida
+por um app Flutter. O pacote Dart foi separado da galeria do Design System para
+não misturar demonstração visual e dados de produto. Ele pode exercitar fluxos
+de tela e comportamentos, mas não recebe requisições HTTP nem testa transporte.
 
-O contrato REST/JSON é uma referência para a futura API. Uma interface de
-repositório foi sugerida como forma de permitir que as telas usem primeiro o
-mock em memória e, no futuro, uma implementação HTTP. Essa fronteira de
-arquitetura ainda precisa ser confirmada antes de implementação.
+O contrato REST/JSON é uma referência para a futura API. O pacote expõe
+`TomathicsRepository` como fronteira inicial para que a camada de aplicação
+possa usar o mock em memória e, futuramente, uma implementação HTTP. A integração
+com telas de um app de produto ainda não existe.
 
 ## 4. Esboço de rotas
 
@@ -250,27 +253,49 @@ Erros devem conter `code`, `message` e `fieldErrors`. Ainda falta decidir se
 `fieldErrors` será um mapa de campo para mensagens, uma lista de ocorrências ou
 outro formato. Os status HTTP correspondentes também estão pendentes.
 
-## 6. Comportamento esperado do mock em memória
+## 6. Comportamento implementado e limites do mock em memória
 
-Quando for implementado, o mock deve apoiar o desenvolvimento das telas e
-oferecer comportamento previsível:
+O primeiro pacote está em `mock_backend/`. Ele apoia o desenvolvimento com:
 
-1. Fornecer dados iniciais de receitas e alvos genéricos.
-2. Executar as operações de catálogo escolhidas e refletir as alterações
+1. Dois exemplos de receita com um identificador de alvo genérico fictício.
+2. Operações em memória de catálogo que refletem alterações
    durante a sessão do mock.
-3. Manter as alterações apenas em memória; reiniciar o mock restaura os dados
+3. Alterações apenas em memória; `reset()` restaura os dados
    iniciais.
-4. Abrir uma sessão fixa de demonstração sem validar e-mail ou senha.
-5. Criar execuções simuladas e expor estados e eventos suficientes para o
-   monitor.
-6. Permitir escolher um cenário para reproduzir progressão automática, sem
-   executar automações reais.
-7. Representar erros de forma estruturada para as telas poderem demonstrar
+4. Sessão fixa de demonstração sem validar e-mail ou senha.
+5. Execuções simuladas com cenários `success`, `failure` e `waiting`, além de
+   estados e eventos para o monitor.
+6. Seleção de cenário na criação da execução e progressão automática via timer,
+   sem executar automações reais.
+7. Erros estruturados para as telas poderem demonstrar
    estados de falha.
 
-Ainda não foram decididos o mecanismo de escolha dos cenários, o conjunto de
-receitas de exemplo, os intervalos da progressão automática ou o formato da
-identidade de demonstração.
+Para executar, analisar e testar o pacote, consulte
+[mock_backend/README.md](../mock_backend/README.md). Os defaults usados para
+tornar o mock executável, e as decisões ainda abertas, estão descritos nesse
+guia e na seção seguinte.
+
+### 6.1 Detalhes provisórios escolhidos para esta fundação
+
+Para fazer a primeira versão executável sem afirmar decisões de produto ainda
+pendentes, o código atualmente adota:
+
+- página padrão de 20 itens, máximo de 100; filtro textual por nome/descrição,
+  filtro por `targetId`, exclusão de arquivadas por padrão e ordenação pelo nome;
+- validação mínima de nome/alvo não vazios, IDs não vazios e únicos, posição
+  finita e referências das conexões a nós existentes; ciclos e portas não são
+  validados;
+- `fieldErrors` como mapa de campo para lista de mensagens, com códigos locais
+  sugeridos de estado `400`, `404` e `409`;
+- edição por substituição do conjunto editável recebido em `RecipeDraft`;
+- duplicação com sufixo `(cópia)`, estado ativo e mesmo alvo/grafo;
+- execução automática por timer, com intervalo padrão de 900 ms e cenários
+  `success`, `failure` e `waiting`; `paused` está no enum, mas não é produzido
+  enquanto pausa/retomada não forem especificadas;
+- sessão fixa com identidade fictícia, sem credenciais, tokens ou validação.
+
+Esses pontos são defaults de implementação, não decisões finais de API. Os
+códigos de estado são apenas uma sugestão para um futuro adaptador HTTP.
 
 ## 7. Questões em aberto
 
@@ -279,10 +304,10 @@ completo:
 
 ### Arquitetura e escopo
 
-- Confirmar se o mock em memória é suficiente ou se será necessário um servidor
-  HTTP local para testar requisições de verdade.
-- Confirmar se as telas dependem de uma interface de repositório, para que o
-  mock e uma futura API HTTP possam ser trocados sem alterar a UI.
+- Decidir se mais adiante será necessário um servidor HTTP local para testar
+  requisições e serialização de verdade.
+- Definir como o futuro app de produto consumirá `TomathicsRepository` e se a
+  abstração precisa ser adaptada ao contrato HTTP final.
 - Decidir se e quando será produzida uma especificação OpenAPI. Ela foi
   recomendada, mas ainda não foi escolhida formalmente.
 
@@ -294,7 +319,8 @@ completo:
 - Formato, finalidade e validação das extensões opcionais.
 - Validação de conexões, portas, referências a nós inexistentes, ciclos e nós
   desconectados.
-- Filtros, ordenação e valores padrão da listagem.
+- Confirmar os filtros, a ordenação e os valores padrão da listagem; os valores
+  atuais do mock são provisórios.
 - Quais campos e referências são incluídos ao duplicar uma receita.
 - Se receitas arquivadas podem ser editadas ou duplicadas e como o histórico se
   comporta ao arquivar/restaurar.
@@ -324,8 +350,8 @@ completo:
 Para evitar especificar configurações imaginárias, a próxima etapa deve começar
 pelos fluxos do produto:
 
-1. Escolher os primeiros alvos/plataformas ou confirmar que o primeiro ciclo
-   será inteiramente genérico.
+1. Escolher os primeiros alvos/plataformas; os exemplos atuais são genéricos e
+   fictícios.
 2. Descrever alguns fluxos reais que uma receita deve representar.
 3. Derivar desses fluxos os dados de cada tipo de nó, incluindo entradas,
    saídas e validações.
@@ -334,8 +360,8 @@ pelos fluxos do produto:
    retomada.
 6. Fechar paginação, filtros, ordenação, envelopes, erros e status HTTP.
 7. Confirmar a fronteira entre mock em memória e repositório da aplicação.
-8. Só então escrever a especificação final do contrato, com exemplos de
-   sucesso, falha e cenários do monitor.
+8. Atualizar o pacote mock conforme as decisões e escrever a especificação
+   final do contrato, com exemplos de sucesso, falha e cenários do monitor.
 
 Ao retomar, preservar as decisões da seção 3. Os itens da seção 7 são pendências
 reais; não devem ser preenchidos silenciosamente por suposição.
